@@ -3,7 +3,7 @@ import { Search, Download, MessageCircle, Users, Car } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
-import { malentachiApi } from "@/integrations/malentachi/client";
+import { malentachi, malentachiApi } from "@/integrations/malentachi/client";
 import { Interesse } from "@/types/interesse";
 import { Header } from "@/components/dashboard/Header";
 import { Footer } from "@/components/dashboard/Footer";
@@ -208,7 +208,9 @@ const Index = () => {
     const sendOne = async (t: Interesse) => {
       const phone = t.numero.replace(/\D/g, "");
       try {
-        const { data, error } = await supabase.functions.invoke("send-whatsapp", {
+        // A função send-whatsapp roda no projeto malentachi (ehlpmukjdknnyhkycncb),
+        // por isso o disparo é invocado por esse client, e não pelo client principal.
+        const { data, error } = await malentachi.functions.invoke("send-whatsapp", {
           // Envio por template aprovado no WTS: só o nome do carro é dinâmico.
           body: { to: phone, carro: t.carro_interesse },
         });
