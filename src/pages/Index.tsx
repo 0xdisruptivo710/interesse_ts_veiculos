@@ -63,7 +63,7 @@ function scoreMatch(carroInteresse: string, query: string): number {
 const PAGE_SIZE = 25;
 const MAX_BATCH = 50;
 const INTERVAL_SECONDS = 30;
-const SENDER_NUMBER = "5515991280217";
+const SENDER_NUMBER = "551534174657";
 const DEFAULT_MESSAGE =
   "Olá, você entrou em contato conosco recentemente atrás {carro}, chegou outro mais novo ainda, gostaria de ver?";
 // Endpoint de disparo individual (será preenchido pelo backend do CRM AIOS).
@@ -205,19 +205,12 @@ const Index = () => {
     if (targets.length === 0 || !message.trim()) return;
     setSending(true);
 
-    const personalize = (t: Interesse) =>
-      message
-        .replace(/\{nome\}/gi, t.nome)
-        .replace(/\{carro\}/gi, t.carro_interesse)
-        .replace(/\[modelo carro\]/gi, t.carro_interesse)
-        .replace(/\[nome\]/gi, t.nome);
-
     const sendOne = async (t: Interesse) => {
       const phone = t.numero.replace(/\D/g, "");
-      const texto = personalize(t);
       try {
         const { data, error } = await supabase.functions.invoke("send-whatsapp", {
-          body: { to: phone, text: texto },
+          // Envio por template aprovado no WTS: só o nome do carro é dinâmico.
+          body: { to: phone, carro: t.carro_interesse },
         });
         const ok = !error && !(data && (data as { success?: boolean }).success === false);
         if (!ok) console.error("Falha no disparo para", phone, error ?? data);
